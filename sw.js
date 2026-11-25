@@ -1,4 +1,4 @@
-const C="wm-v7",PK="wm-pack-v1",PACK="core.json.gz",FILES=["./","index.html","manifest.json","icon-192.png","icon-512.png"];
+const C="wm-v7",PK="wm-pack-v1",PACK="6-core.json.gz",FILES=["./","index.html","manifest.json","4-icon-192.png","5-icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil((async()=>{
  await (await caches.open(C)).addAll(FILES);
  try{const p=await caches.open(PK);if(!await p.match(PACK)){const r=await fetch(PACK);if(r.ok)await p.put(PACK,r)}}catch(x){}
@@ -6,6 +6,6 @@ self.addEventListener("install",e=>{e.waitUntil((async()=>{
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C&&x!==PK).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{const r=e.request,u=new URL(r.url);
  if(r.method!=="GET"||u.origin!==location.origin||u.pathname.startsWith("/api/"))return;
- if(u.pathname.endsWith("core.json.gz")){
+ if(u.pathname.endsWith("6-core.json.gz")){
   e.respondWith(caches.open(PK).then(async c=>{const h=await c.match(PACK);if(h)return h;const n=await fetch(r);if(n.ok)c.put(PACK,n.clone());return n}));return}
  e.respondWith(caches.match(r,{ignoreSearch:true}).then(h=>h||fetch(r).then(n=>{const c=n.clone();caches.open(C).then(x=>x.put(r,c));return n}).catch(()=>r.mode==="navigate"?caches.match("index.html"):Response.error())))});
