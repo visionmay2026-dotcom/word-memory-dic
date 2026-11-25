@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>كلمة وصورة (أوفلاين)</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#173e35">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="كلمة وصورة">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#eef3f0;--card:#fff;--ink:#12261f;--mut:#5b6f67;--g:#173e35;--a:#e3a21a;--line:#d3ddd8;--ok:#1d7a4f}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1b17;--card:#162923;--ink:#e8f0ec;--mut:#9bb0a7;--g:#6fc2a3;--line:#2a443b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 "Noto Naskh Arabic","Geeza Pro",Tahoma,sans-serif}
+header{background:#173e35;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-size:22px;flex:1}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:transparent;color:#cfe3da;border:1px solid #3d6a5d;border-radius:8px;padding:6px 14px;font:inherit;cursor:pointer}
+nav button.on{background:var(--a);color:#222;border-color:var(--a)}
+main{max-width:760px;margin:0 auto;padding:18px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0;color:var(--ink)}
+input{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+button.b{background:var(--g);color:#fff;border:0;border-radius:8px;padding:9px 16px;font:inherit;cursor:pointer}
+@media(prefers-color-scheme:dark){button.b{color:#08140f}}
+button.s{background:transparent;color:var(--g);border:1px solid var(--g)}
+button:disabled{opacity:.5}
+:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.en{direction:ltr;text-align:left;font-family:Georgia,serif}
+.big{font-size:34px;margin:0}
+.mut{color:var(--mut);font-size:15px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:0 10px;margin:2px;cursor:pointer}
+.box{display:inline-block;min-width:22px;text-align:center;border-radius:6px;background:var(--a);color:#222;font-size:13px;padding:0 6px}
+.sec h4{margin:0 0 4px;color:var(--g)}
+.sec ul{margin:4px 0;padding-inline-start:20px}
+pre.tree{direction:ltr;text-align:left;overflow:auto;font:14px/1.5 monospace;background:var(--bg);padding:10px;border-radius:8px}
+blockquote{margin:8px 0;padding:6px 14px;border-inline-start:4px solid var(--a)}
+textarea{width:100%;font:14px monospace;direction:ltr;min-height:90px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input{min-height:44px}
+nav button{flex:1;white-space:nowrap}
+@media(max-width:520px){main{padding:12px}.big{font-size:28px}header h1{flex-basis:100%}pre.tree{font-size:12px}}
+</style>
+</head>
+<body>
+<header><h1>كلمة وصورة</h1>
+<nav><button data-t="s" class="on">بحث</button><button data-t="r">مراجعة <span id="due" class="box">0</span></button><button data-t="m">كلماتي</button><button data-t="d">البيانات</button></nav></header>
+<main>
+<section id="s" class="on">
+<div class="row"><input id="q" class="en" placeholder="اكتب كلمة إنجليزية" autocomplete="off" style="flex:1"><button class="b" id="go">ابحث</button></div>
+<div id="gst" class="mut"></div>
+<div id="res"></div>
+</section>
+<section id="r"><div id="rv" class="card"></div></section>
+<section id="m">
+<div class="row"><input id="f" placeholder="تصفية كلماتي" style="flex:1"><button class="b s" id="addNew">+ كلمة جديدة</button></div>
+<div id="list"></div>
+</section>
+<section id="d">
+<div class="card"><b>القاموس المحلي</b>
+<p class="mut" id="dst"></p>
+<p>حمّل ملف قاموس JSON مرة واحدة (مثلاً 25 ألف كلمة)، فيُحفظ في المتصفح ويعمل بعدها بلا إنترنت.</p>
+<input type="file" id="dfile" accept=".json">
+<p class="mut en">[{"w":"instinct","ar":"غريزة","pos":"noun","def":"...","ex":"...","syn":["impulse"]}]</p></div>
+<div class="card"><b>استيراد كلمات إلى «كلماتي»</b>
+<p>ملف CSV أو نص، كل سطر: <span class="en">word,معنى</span></p>
+<input type="file" id="cfile" accept=".csv,.txt"></div>
+<div class="card"><b>الحزمة اللغوية</b>
+<p class="mut">معاني ومرادفات وأضداد (WordNet)، نطق (CMUdict)، أصول الكلمات وعائلاتها (Etymological WordNet)، وترجمة عربية جزئية تقريبية. تُنزَّل مرة واحدة ثم تعمل بدون إنترنت. دروسك المولَّدة لا تُستبدل.</p>
+<button class="b" id="pk">تنزيل / تحديث الحزمة</button><p class="mut" id="pst"></p>
+<p class="mut">المصادر: Princeton WordNet 3.1، CMU Pronouncing Dictionary، Etymological WordNet (CC BY-SA 3.0)، English Wiktionary عبر kaikki.org (CC BY-SA 4.0).</p></div>
+<div class="card"><b>التوليد المحلي (Ollama)</b>
+<p class="mut">يعمل بدون إنترنت إذا كان Ollama شغّالاً على جهازك.</p>
+<input id="oe" class="en" placeholder="Endpoint"><p></p><input id="om" class="en" placeholder="اسم النموذج">
+<p class="mut">إذا فتحت الملف مباشرة وفشل الاتصال، شغّل التطبيق من خادم محلي: <span class="en">python -m http.server 8000</span> داخل المجلد، ثم افتح <span class="en">localhost:8000</span>.</p></div>
+<div class="card"><b>إضافة درس كلمة</b>
+<p>اطلب من Claude درساً بصيغة JSON (انسخ الطلب بالزر)، ثم الصق الناتج هنا.</p>
+<div class="row"><button class="b s" id="cp">نسخ الطلب</button></div>
+<textarea id="lj" placeholder='{"w":"...","ar":"...","lesson":{...}}'></textarea>
+<button class="b" id="ls">حفظ الدرس</button></div>
+<div class="card"><b>نسخة احتياطية</b>
+<div class="row"><button class="b" id="exp">تصدير كلماتي</button><input type="file" id="imp" accept=".json" style="flex:1"></div></div>
+</section>
+</main>
+<dialog id="dlg" class="card" style="max-width:420px;width:92%">
+<h3>كلمة جديدة</h3>
+<p><input id="nw" class="en" placeholder="الكلمة"></p>
+<p><input id="nar" placeholder="المعنى بالعربية"></p>
+<p><input id="nex" class="en" placeholder="جملة مثال (اختياري)"></p>
+<div class="row"><button class="b" id="nsave">حفظ</button><button class="b s" id="ncancel">إلغاء</button></div>
+</dialog>
+<script>
+const $=s=>document.querySelector(s),DAY=864e5;
+const LESSON_INSTINCT={sections:[
+{t:"1. المعنى والنطق",b:"- **Instinct** (اسم): غريزة، فطرة، سجية، حدس.\n- IPA: `/ˈɪn.stɪŋkt/`\n- مقطعان: **IN**-stinct. التشديد على المقطع الأول بكسرة قصيرة حادة.\n- ينتهي بتتابع ساكن n-k-t دون حرف علة بينها: إنْ-سْتِنْكْت."},
+{t:"2. الأصل اللغوي",b:"- من اللاتينية *instinctus* (دافع، تحريض، إلهام)، اسم مفعول من *instinguere* (يحث، يحفّز).\n- الجذر الهندوأوروبي `*steig-` بمعنى يخز ويثقب، ومنه المعنى المجازي: الوخز الداخلي الذي يدفع الكائن للتصرف دون تفكير.\n- البنية: **in-** (في الداخل) + **-stinct** (يخز / يحفز).\n- المقابل الجرماني `*stik-`: أعطى **stick** و**sting**، فيلتقي المعنيان عند فكرة اللدغة الفطرية التي تحرك السلوك."},
+{t:"3. شبكة الجذر نفسه",b:"- **Distinct** (متميز): dis- + stinct، ما وُخز ليفترق عن غيره.\n- **Extinct** (منقرض): ex- + stinct، ما انطفأت حياته بالكامل.\n- **Stimulus** (محفّز): من الجذر `*steig-` نفسه.\n- **Stigma** (وصمة): من اليونانية، علامة الوخز أو الكي."},
+{t:"4. المترادفات والأضداد",b:"- **مترادفات:** intuition (حدس)، impulse (دافع)، gut feeling (شعور داخلي)، innate drive (دافع فطري)، reflex (رد فعل تلقائي).\n- **أضداد:** reason (العقل)، deliberation (التروي)، calculation (الحساب والتخطيط)، learned behavior (سلوك مكتسب)."},
+{t:"5. المتلازمات اللفظية",b:"- Survival instinct: غريزة البقاء.\n- Basic / Primal instinct: غريزة أساسية / بدائية.\n- Maternal / Paternal instinct: غريزة الأمومة / الأبوة.\n- Gut instinct: حدس داخلي عميق.\n- Follow / Trust one's instinct: يتبع غريزته أو يثق بحدسه.\n- Act on instinct: يتصرف بدافع الغريزة.\n- *He instinctively ducked when he heard the loud noise.* (انحنى تلقائياً عند سماع الصوت العالي).\n- *Animals instinctually migrate before the harsh winter.* (تهاجر الحيوانات بشكل فطري قبل الشتاء)."},
+{t:"6. البعد الفلسفي والسياسي",b:"- **فلسفياً:** الغريزة حدّ فاصل بين الطبيعة والعقل. عند نيتشه هي المحرك الحقيقي للوجود تحت قشرة الأخلاق. وعند كانط هي صوت الطبيعة الذي يقود الكائن قبل بلوغه الرشد العقلي.\n- **سياسياً:** Herd instinct (انصياع الجماهير دون تفكير نقدي)، Political instinct (استشعار القائد لتحولات الرأي العام)، Tribal instinct (اصطفاف قائم على الهوية والولاء الأعمى).\n- **الاستخدام التضليلي:** يُوظَّف الخطاب الشعبوي مفهوم الغريزة لتبرير العنف والإقصاء باعتباره أمراً طبيعياً لا مفر منه، فيُسلب الفعل مسؤوليته الأخلاقية ويتحول من جريمة واعية إلى حتمية بيولوجية."}],
+tree:"        [ *steig- / stinguere ]\n                  |\n     +------------+------------+\n     |            |            |\ninstinct     instinctive   instinctual\n(noun)         (adj)         (adj)\n   |             |             |\ninstinctiveness instinctively instinctually\n                (adv)         (adv)",
+quote:{en:"The instinct of nearly all societies is to lock up anybody who is truly free. First, society begins by trying to beat you up. If this fails, they try to poison you. If this fails too, they finish by loading honors on your head.",ar:"غريزة المجتمعات تقريباً أن تحبس كل من هو حرّ حقاً: تحاول أولاً تحطيمه، فإن فشلت حاولت تسميمه، فإن فشلت أغرقت رأسه بالأوسمة.",by:"ألبير كامو"}};
+const BASE=[
+{w:"instinct",ipa:"/ˈɪn.stɪŋkt/",ar:"غريزة",pos:"noun",def:"A natural way of acting that does not need to be learned.",ex:"A bird builds a nest by instinct.",syn:["impulse","intuition"],lesson:LESSON_INSTINCT},
+{w:"curiosity",ar:"فضول",pos:"noun",def:"A strong wish to know or learn something.",ex:"Curiosity led her to open the box.",syn:["interest"]},
+{w:"resilient",ar:"مرن، قادر على التعافي",pos:"adjective",def:"Able to recover quickly after trouble.",ex:"Children are often very resilient.",syn:["tough","flexible"]},
+{w:"serendipity",ar:"صدفة سعيدة",pos:"noun",def:"Finding something good by chance.",ex:"Meeting her was pure serendipity.",syn:["luck"]},
+{w:"mother",ar:"أم",pos:"noun",def:"A female parent.",ex:"My mother cooks every Friday.",syn:["mom","mum"]},
+{w:"habit",ar:"عادة",pos:"noun",def:"Something you do often, without thinking.",ex:"Reading before bed is a good habit.",syn:["routine"]},
+{w:"memory",ar:"ذاكرة",pos:"noun",def:"The ability to remember things.",ex:"He has a great memory for faces.",syn:["recall"]},
+{w:"improve",ar:"يحسّن، يتحسّن",pos:"verb",def:"To become better, or make something better.",ex:"Practice will improve your English.",syn:["enhance"]}];
+let DICT=new Map(BASE.map(e=>[e.w,e]));
+let mine=JSON.parse(localStorage.getItem("wm_mine")||"{}");
+const save=()=>{localStorage.setItem("wm_mine",JSON.stringify(mine));due()};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const idb=()=>new Promise((ok,no)=>{const r=indexedDB.open("wm",1);r.onupgradeneeded=()=>r.result.createObjectStore("k");r.onsuccess=()=>ok(r.result);r.onerror=no});
+async function idbGet(){try{const d=await idb();return await new Promise(ok=>{const g=d.transaction("k").objectStore("k").get("dict");g.onsuccess=()=>ok(g.result);g.onerror=()=>ok(null)})}catch(e){return null}}
+async function idbSet(v){const d=await idb();return new Promise((ok,no)=>{const t=d.transaction("k","readwrite");t.objectStore("k").put(v,"dict");t.oncomplete=ok;t.onerror=no})}
+function merge(j,keep){let n=0;(Array.isArray(j)?j:Object.entries(j).map(([w,v])=>({w,...v}))).forEach(e=>{if(e&&e.w){const k=String(e.w).toLowerCase();if(keep&&!e.u&&DICT.get(k)&&DICT.get(k).lesson)return;DICT.set(k,e);n++}});return n}
+const dst=()=>$("#dst").textContent="عدد الكلمات المتاحة الآن: "+DICT.size;
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+ document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===b.dataset.t));
+ if(b.dataset.t==="r")review();if(b.dataset.t==="m")renderList();if(b.dataset.t==="d")dst()});
+function say(t){if(!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}
+const chips=a=>a.map(s=>`<span class="chip" onclick="lookup('${esc(s)}')">${esc(s)}</span>`).join("");
+function entry(e){const has=!!mine[e.w];
+ return `<div class="card"><p class="big en">${esc(e.w)} <button class="b s" onclick="say('${esc(e.w)}')" aria-label="نطق">🔊</button></p>
+ <p class="mut en">${esc(e.pos||"")} ${esc(e.ipa||"")}</p><p><b>${esc(e.ar||"لا توجد ترجمة")}</b></p>
+ ${e.def?`<p class="en">${esc(e.def)}</p>`:""}${e.ex?`<p class="en mut">“${esc(e.ex)}”</p>`:""}
+ ${(e.syn&&e.syn.length)?`<p class="en">${chips(e.syn)}</p>`:""}
+ ${lessonHTML(e)}${e.lesson?"":`<button class="b s" onclick="gen('${esc(e.w)}')">ولّد درساً (Ollama)</button> `}<button class="b" ${has?"disabled":""} onclick="addW('${esc(e.w)}')">${has?"في كلماتي":"☆ أضف إلى كلماتي"}</button></div>`}
+function lookup(w){$("#q").value=w;find()}
+function find(){const w=$("#q").value.trim().toLowerCase();if(!w){$("#res").innerHTML="";return}
+ const e=DICT.get(w);if(e){$("#res").innerHTML=entry(e);return}
+ const sug=[...DICT.keys()].filter(k=>k.startsWith(w)).slice(0,12);
+ $("#res").innerHTML=`<div class="card">لا توجد «${esc(w)}» في القاموس المحلي.${sug.length?`<p class="en">${chips(sug)}</p>`:""}<button class="b" onclick="gen('${esc(w)}')">ولّد درساً (Ollama)</button> <button class="b s" onclick="quickAdd('${esc(w)}')">أضفها يدوياً</button></div>`}
+$("#go").onclick=find;$("#q").oninput=find;
+function addW(w){const e=DICT.get(w);if(!e||mine[w])return;mine[w]={ar:e.ar||"",ex:e.ex||"",box:1,next:Date.now()};save();find()}
+function quickAdd(w){$("#nw").value=w;$("#nar").value="";$("#nex").value="";$("#dlg").showModal()}
+$("#addNew").onclick=()=>quickAdd("");$("#ncancel").onclick=()=>$("#dlg").close();
+$("#nsave").onclick=()=>{const w=$("#nw").value.trim().toLowerCase();if(!w)return;
+ mine[w]={ar:$("#nar").value.trim(),ex:$("#nex").value.trim(),box:1,next:Date.now()};
+ if(!DICT.has(w))DICT.set(w,{w,ar:mine[w].ar,ex:mine[w].ex});
+ save();$("#dlg").close();renderList()};
+function renderList(){const f=$("#f").value.trim().toLowerCase(),ks=Object.keys(mine).filter(k=>!f||k.includes(f)||(mine[k].ar||"").includes(f)).sort();
+ $("#list").innerHTML=ks.length?ks.map(k=>`<div class="card row"><div style="flex:1"><b class="en">${esc(k)}</b> <span class="mut">${esc(mine[k].ar)}</span><br><span class="mut">الصندوق <span class="box">${mine[k].box}</span> · المراجعة ${new Date(mine[k].next).toLocaleDateString("ar")}</span></div><button class="b s" onclick="say('${esc(k)}')">🔊</button><button class="b s" onclick="del('${esc(k)}')">حذف</button></div>`).join(""):`<p class="mut">لا توجد كلمات بعد. ابحث عن كلمة وأضفها.</p>`}
+$("#f").oninput=renderList;
+function del(k){if(confirm("حذف «"+k+"»؟")){delete mine[k];save();renderList()}}
+const IV=[0,1,3,7,16,35];let cur=null;
+const dueList=()=>Object.keys(mine).filter(k=>mine[k].next<=Date.now());
+function due(){$("#due").textContent=dueList().length}
+function review(){const l=dueList(),el=$("#rv");
+ if(!l.length){el.innerHTML=`<p>لا توجد كلمات مستحقة للمراجعة الآن.</p><p class="mut">أضف كلمات من البحث، وتظهر هنا في موعدها.</p>`;cur=null;return}
+ cur=l[Math.floor(Math.random()*l.length)];const e=DICT.get(cur)||{};
+ el.innerHTML=`<p class="mut">المتبقي: ${l.length}</p><p class="big en">${esc(cur)} <button class="b s" onclick="say('${esc(cur)}')">🔊</button></p>
+ <p class="mut">فكّر في المعنى ثم اكشف الإجابة.</p><button class="b" id="rev">اكشف الإجابة</button><div id="ans"></div>`;
+ $("#rev").onclick=()=>{$("#ans").innerHTML=`<p><b>${esc(mine[cur].ar||e.ar||"")}</b></p>${(mine[cur].ex||e.ex)?`<p class="en mut">“${esc(mine[cur].ex||e.ex)}”</p>`:""}<div class="row"><button class="b" onclick="grade(1)">عرفتها</button><button class="b s" onclick="grade(0)">لم أعرفها</button></div>`;$("#rev").hidden=true}}
+function grade(ok){const m=mine[cur];m.box=ok?Math.min(5,m.box+1):1;m.next=Date.now()+(ok?IV[m.box]*DAY:6e5);save();review()}
+$("#dfile").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ try{const j=JSON.parse(await f.text());const n=merge(j);await idbSet(j);dst();alert("تم تحميل "+n+" كلمة، وستعمل بدون إنترنت.")}catch(x){alert("الملف ليس JSON صالحاً.")}};
+$("#cfile").onchange=async e=>{const f=e.target.files[0];if(!f)return;let n=0;
+ (await f.text()).split(/\r?\n/).forEach(l=>{const i=l.search(/[,\t;]/),w=(i<0?l:l.slice(0,i)).trim().toLowerCase();if(!w)return;
+  const ar=i<0?"":l.slice(i+1).trim();mine[w]={ar,ex:"",box:1,next:Date.now()};if(!DICT.has(w))DICT.set(w,{w,ar});n++});
+ save();alert("تم استيراد "+n+" كلمة.")};
+$("#exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(mine,null,1)],{type:"application/json"}));a.download="my-words.json";a.click()};
+$("#imp").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{Object.assign(mine,JSON.parse(await f.text()));save();alert("تمت الاستعادة.")}catch(x){alert("ملف غير صالح.")}};
+function fmt(t){return esc(t).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`(.+?)`/g,'<bdi class="en">$1</bdi>').replace(/\*(.+?)\*/g,"<i>$1</i>")}
+function body(b){let o="",u=false;b.split("\n").forEach(l=>{if(l.startsWith("- ")){if(!u){o+="<ul>";u=true}o+="<li>"+fmt(l.slice(2))+"</li>"}else{if(u){o+="</ul>";u=false}if(l.trim())o+="<p>"+fmt(l)+"</p>"}});return o+(u?"</ul>":"")}
+function lessonHTML(e){const L=e.lesson;if(!L)return "";
+ return (L.sections||[]).map(x=>`<div class="sec"><h4>${esc(x.t)}</h4>${body(x.b||"")}</div>`).join("")
+ +(L.tree?`<div class="sec"><h4>شجرة العائلة</h4><pre class="tree">${esc(L.tree)}</pre></div>`:"")
+ +(L.quote?`<div class="sec"><h4>اقتباس</h4><blockquote><p class="en">${esc(L.quote.en)}</p><p>${esc(L.quote.ar||"")}</p><span class="mut">${esc(L.quote.by||"")}</span></blockquote></div>`:"")}
+const PROMPT=w=>`اكتب درساً للكلمة الإنجليزية: ${w||"WORD"}\nأعد JSON فقط بهذا الشكل:\n{"w":"","ipa":"","ar":"","pos":"","def":"","ex":"","syn":[],"lesson":{"sections":[{"t":"عنوان","b":"- نقطة\\n- نقطة"}],"tree":"شجرة نصية ASCII","quote":{"en":"","ar":"","by":""}}}\nالأقسام: 1 المعنى والنطق، 2 الأصل والجذر والتفكيك الصرفي، 3 شبكة الكلمات من نفس الجذر، 4 المترادفات والأضداد، 5 المتلازمات وأمثلة الظروف، 6 البعد الفلسفي والسياسي والاستخدام التضليلي. الاقتباس يجب أن يكون موثقاً فقط.`;
+$("#cp").onclick=()=>{const w=prompt("الكلمة؟");if(w)navigator.clipboard.writeText(PROMPT(w)).then(()=>alert("تم النسخ"),()=>prompt("انسخ الطلب:",PROMPT(w)))};
+$("#ls").onclick=async()=>{try{const j=JSON.parse($("#lj").value);const a=Array.isArray(j)?j:[j];const n=await saveEntries(a);$("#lj").value="";alert("تم حفظ "+n+" درس.")}catch(x){alert("JSON غير صالح.")}};
+$("#oe").value=localStorage.getItem("wm_oe")||(location.protocol.startsWith("http")?"/api/generate":"http://localhost:11434/api/generate");
+$("#om").value=localStorage.getItem("wm_om")||"gemma4:e4b";
+$("#oe").onchange=()=>localStorage.setItem("wm_oe",$("#oe").value.trim());
+$("#om").onchange=()=>localStorage.setItem("wm_om",$("#om").value.trim());
+const SYS="أنت محلل لغوي ومتخصص في أصول الكلمات. اتبع الإطار المطلوب بدقة وأعد JSON صالحاً فقط بلا أي نص خارجه. اكتب المحتوى بالعربية مع المصطلحات الإنجليزية. لا تختلق اقتباسات ولا أصولاً؛ إن لم تكن متأكداً اترك الحقل فارغاً أو اكتب أنه غير مؤكد.";
+async function saveEntries(a){a.forEach(x=>x.u=1);const n=merge(a);const old=(await idbGet())||[];const arr=Array.isArray(old)?old:Object.entries(old).map(([w,v])=>({w,...v}));a.forEach(x=>{const i=arr.findIndex(y=>y.w===x.w);i<0?arr.push(x):arr[i]=x});await idbSet(arr);dst();return n}
+async function gen(w){
+ const st=$("#gst"),ep=$("#oe").value.trim(),md=$("#om").value.trim();
+ st.textContent="جارٍ توليد درس «"+w+"» بالنموذج "+md+"... قد يستغرق دقائق.";
+ const ac=new AbortController(),t=setTimeout(()=>ac.abort(),3e5);
+ try{
+  const r=await fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},signal:ac.signal,
+   body:JSON.stringify({model:md,system:SYS,prompt:PROMPT(w),stream:false,format:"json",options:{temperature:.3}})});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const o=JSON.parse((await r.json()).response);
+  if(!o.lesson||!Array.isArray(o.lesson.sections)||!o.lesson.sections.length)throw new Error("الرد لا يحتوي أقسام درس صالحة");
+  o.w=w;if(o.lesson.quote&&!o.lesson.quote.en)delete o.lesson.quote;
+  await saveEntries([o]);st.textContent="تم حفظ الدرس. راجع الأصل والاقتباس قبل الاعتماد عليهما.";lookup(w);
+ }catch(e){st.textContent="تعذّر التوليد: "+(e.name==="AbortError"?"انتهت المهلة":e.message)+". تأكد أن Ollama يعمل وأن اسم النموذج صحيح."}
+ finally{clearTimeout(t)}}
+if("serviceWorker"in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+function offState(){return("serviceWorker"in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))?" (التطبيق والحزمة محفوظان على الجهاز).":" ⚠ الصفحة ليست على https فلن يعمل التطبيق نفسه بدون إنترنت؛ ارفعه على استضافة https."}
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+async function loadPack(){
+ const st=$("#pst");st.textContent="جارٍ تنزيل الحزمة اللغوية (قد تستغرق دقيقة)...";
+ try{
+  let j;
+   const r=await fetch("core.json.gz");if(!r.ok)throw new Error("HTTP "+r.status);
+   const buf=new Uint8Array(await r.arrayBuffer());
+   if(buf[0]===0x1f&&buf[1]===0x8b){
+    if(typeof DecompressionStream==="undefined")throw new Error("المتصفح قديم: حدّث Safari/Chrome");
+    j=JSON.parse(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).text())}
+   else j=JSON.parse(new TextDecoder().decode(buf));
+   const old=(await idbGet())||[],oa=Array.isArray(old)?old:Object.entries(old).map(([w,v])=>({w,...v}));
+  const user=oa.filter(x=>x.u),um=new Set(user.map(x=>x.w)),arr=Object.entries(j).map(([w,v])=>({w,...v}));
+  const all=user.concat(arr.filter(x=>!um.has(x.w)));
+  await idbSet(all);merge(all,true);dst();st.textContent="تم: "+arr.length+" كلمة جاهزة بدون إنترنت."+offState()
+ }catch(e){st.textContent="تعذّر تنزيل الحزمة ("+e.message+"). شغّل التطبيق عبر run.bat أو من استضافة، لأن فتح الملف مباشرة لا يسمح بالتنزيل."}}
+$("#pk").onclick=loadPack;
+(async()=>{const s=await idbGet();if(s){merge(s,true);$("#pst").textContent="الحزمة محفوظة على الجهاز"+offState()}else if(location.protocol.startsWith("http"))loadPack();dst();due()})();
+</script>
+</body>
+</html>
