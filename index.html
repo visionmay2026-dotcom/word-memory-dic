@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="كلمة وصورة">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="4-icon-192.png">
 <style>
 :root{--bg:#eef3f0;--card:#fff;--ink:#12261f;--mut:#5b6f67;--g:#173e35;--a:#e3a21a;--line:#d3ddd8;--ok:#1d7a4f}
 @media(prefers-color-scheme:dark){:root{--bg:#0e1b17;--card:#162923;--ink:#e8f0ec;--mut:#9bb0a7;--g:#6fc2a3;--line:#2a443b}}
@@ -205,7 +205,7 @@ async function loadPack(){
  const st=$("#pst");st.textContent="جارٍ تنزيل الحزمة اللغوية (قد تستغرق دقيقة)...";
  try{
   let j;
-   const r=await fetch("core.json.gz");if(!r.ok)throw new Error("HTTP "+r.status);
+   const r=await fetch("6-core.json.gz");if(!r.ok)throw new Error("HTTP "+r.status);
    const buf=new Uint8Array(await r.arrayBuffer());
    if(buf[0]===0x1f&&buf[1]===0x8b){
     if(typeof DecompressionStream==="undefined")throw new Error("المتصفح قديم: حدّث Safari/Chrome");
